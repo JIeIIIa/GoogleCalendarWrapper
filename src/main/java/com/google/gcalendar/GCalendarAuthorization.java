@@ -1,3 +1,5 @@
+package com.google.gcalendar;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -16,17 +18,16 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by JIeIIIa on 30.11.2016.
- */
-public class GCalendar {
+public class GCalendarAuthorization {
+
     /** Application name. */
     private static final String APPLICATION_NAME =
             "Google Calendar API Java Quickstart";
+    private static final String DEFAULT_DATA_STORE_DIR = new java.io.File(
+            System.getProperty("user.home"), ".credentials/calendar-java-api").getPath();
 
     /** Directory to store user credentials for this application. */
-    private static final java.io.File DATA_STORE_DIR = new java.io.File(
-            System.getProperty("user.home"), ".credentials/calendar-java-quickstart");
+    private static final java.io.File DATA_STORE_DIR = new java.io.File(DEFAULT_DATA_STORE_DIR);
 
     /** Global instance of the {@link FileDataStoreFactory}. */
     private static FileDataStoreFactory DATA_STORE_FACTORY;
@@ -61,22 +62,11 @@ public class GCalendar {
      * @return an authorized Credential object.
      * @throws IOException
      */
-    public static Credential authorize() throws IOException {
-        // Load client secrets.
-//        InputStream in =
-//                Quickstart.class.getResourceAsStream("main/java/client_secret.json");
+    public static Credential authorize(String clientSecretJSON) throws IOException {
 
-//        String clientSecretJSON = "/CalendarApi-9d17b05bdb5d.json";
-//        String clientSecretJSON = "/CalendarApi-40b1e3e48171.json";
-//        String clientSecretJSON = "/CalendarApi-40b1e3e48171_tmp.json";
-        String clientSecretJSON = "/client_secret_603944093158-tr62li4i083rrfi80mqojs3aioobl786.apps.googleusercontent.com.json";
-        /*InputStream in =
-                Quickstart.class.getResourceAsStream("/CalendarApi-40b1e3e48171.json");*/
-        InputStream in =
-                GCalendar.class.getResourceAsStream(clientSecretJSON);
+        InputStream in = GCalendarAuthorization.class.getResourceAsStream(clientSecretJSON);
 
-        GoogleClientSecrets clientSecrets =
-                GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow =
@@ -86,10 +76,8 @@ public class GCalendar {
                         .setAccessType("offline")
                         .setApprovalPrompt("force")
                         .build();
-        Credential credential = new AuthorizationCodeInstalledApp(
-                flow, new LocalServerReceiver()).authorize("user");
-        System.out.println(
-                "Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
+        Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+//        System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
 
         return credential;
     }
@@ -99,12 +87,12 @@ public class GCalendar {
      * @return an authorized Calendar client service
      * @throws IOException
      */
-    public static com.google.api.services.calendar.Calendar
-    getCalendarService() throws IOException {
-        Credential credential = authorize();
+
+    public static com.google.api.services.calendar.Calendar getCalendarService(String clientSecretJSON) throws IOException {
+        Credential credential = authorize(clientSecretJSON);
         return new com.google.api.services.calendar.Calendar.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME)
-                .build();
+                                                                HTTP_TRANSPORT, JSON_FACTORY, credential)
+                                                                .setApplicationName(APPLICATION_NAME)
+                                                                .build();
     }
 }
