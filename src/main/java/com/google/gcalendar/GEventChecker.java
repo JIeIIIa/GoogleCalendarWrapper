@@ -1,5 +1,6 @@
 package com.google.gcalendar;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class GEventChecker implements GEventCheckable {
@@ -53,19 +54,32 @@ public class GEventChecker implements GEventCheckable {
         return title;
     }
 
+    private boolean compareDate(Date first, Date second) {
+        Calendar cFirst = Calendar.getInstance();
+        cFirst.setTimeInMillis(first.getTime());
+        cFirst.set(Calendar.MILLISECOND, 0);
+        Calendar cSecond = Calendar.getInstance();
+        cSecond.setTimeInMillis(first.getTime());
+        cSecond.set(Calendar.MILLISECOND, 0);
+
+        return cFirst.equals(cSecond);
+    }
+
     public boolean check(GEvent event) {
         boolean res = true;
         if (startAfterDate != null) {
-            res = startAfterDate.before(event.getStart());
+            boolean tmp = startAfterDate.before(event.getStart()) ;
+            tmp |= compareDate(startAfterDate,event.getStart());
+            res = tmp;
         }
         if (startBeforeDate != null) {
-            res &= startBeforeDate.after(event.getStart());
+            res &= startBeforeDate.after(event.getStart()) || compareDate(startBeforeDate,event.getStart());
         }
         if (finishAfterDate != null) {
-            res &= finishAfterDate.before(event.getFinish());
+            res &= finishAfterDate.before(event.getFinish()) || compareDate(finishAfterDate,event.getFinish());
         }
         if (finishBeforeDate != null) {
-            res &= finishBeforeDate.after(event.getFinish());
+            res &= finishBeforeDate.after(event.getFinish()) || compareDate(finishBeforeDate,event.getFinish());
         }
 
         if (title != null && event.getTitle() != null) {

@@ -63,4 +63,35 @@ public class GCalendar {
         return list;
     }
 
+
+    public List<GEvent> addEvents(List<GEvent> list) throws GCalendarException {
+        List<GEvent> nonAddedEvents = new ArrayList<>();
+
+        for (GEvent gEvent : list) {
+            try {
+                service.events().insert(calendarID, Utils.toGoogleEvent(gEvent)).execute();
+            } catch (IOException e) {
+                nonAddedEvents.add(gEvent);
+                //throw new GCalendarException("Can't add events", e);
+            }
+
+        }
+        return nonAddedEvents;
+    }
+
+    public List<GEvent> delEvents(List<GEvent> list) {
+        List<GEvent> nonDeletedEvents = new ArrayList<>();
+        for (GEvent gEvent : list) {
+            try {
+                if (gEvent.getId() == null || gEvent.getId().isEmpty()) {
+                    nonDeletedEvents.add(gEvent);
+                } else {
+                    service.events().delete(calendarID, gEvent.getId()).execute();
+                }
+            } catch (IOException e) {
+                nonDeletedEvents.add(gEvent);
+            }
+        }
+        return nonDeletedEvents;
+    }
 }

@@ -6,6 +6,7 @@ public class GEvent {
     private String Title;
     private Date start;
     private Date finish;
+    private String id;
 
     public GEvent(String title, Date start, Date finish) {
         Title = title;
@@ -35,6 +36,15 @@ public class GEvent {
 
     public void setFinish(Date finish) {
         this.finish = finish;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public GEvent setId(String id) {
+        this.id = id;
+        return this;
     }
 }
 
