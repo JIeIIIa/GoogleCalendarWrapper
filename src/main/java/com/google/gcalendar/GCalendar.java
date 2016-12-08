@@ -47,7 +47,7 @@ public class GCalendar {
             if (checker.getTitle() != null) {
                 readEvents = readEvents.setQ(checker.getTitle());
             }
-            events = readEvents.execute();
+            events = readEvents.setSingleEvents(true).execute();
         } catch (IOException e) {
             throw new GCalendarException("Can't get event list.", e);
         }
@@ -55,6 +55,15 @@ public class GCalendar {
         List<Event> items = events.getItems();
 
         for (Event event : items) {
+            System.out.println("==========================");
+            System.out.println(event.getStart() + " -> " + event.getRecurringEventId() );
+            List<String> rec = event.getRecurrence();
+            if(rec != null) {
+                for (String s : rec) {
+                    System.out.println("   " + s);
+                }
+            }
+            System.out.println("==========================");
             GEvent current = Utils.toGEvent(event);
             if (checker.check(current)) {
                 list.add(current);

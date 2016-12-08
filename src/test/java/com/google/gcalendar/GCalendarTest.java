@@ -30,6 +30,18 @@ public class GCalendarTest {
         start = new Date();
     }
 
+    @Test
+    @Ignore
+    public void infoAboutEvent() throws Exception {
+        String title = "Every week by 3";
+        List<GEvent> list = gCalendar.getEvents(new GEventChecker()
+                .setTitle(title)
+                .setStartAfterDate(sdf.parse("01.03.2017"))
+                .setFinishBeforeDate(sdf.parse("01.05.2017")));
+        for (GEvent gEvent : list) {
+            //System.out.println(gEvent);
+        }
+    }
 
 
     @Test
