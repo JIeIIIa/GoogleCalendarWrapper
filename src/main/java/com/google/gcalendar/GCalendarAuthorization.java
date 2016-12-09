@@ -11,18 +11,33 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.client.googleapis.extensions.appengine.auth.oauth2.AppIdentityCredential;
+import com.google.api.services.sqladmin.SQLAdmin;
+import com.google.api.services.sqladmin.SQLAdminScopes;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.services.sqladmin.SQLAdminScopes;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.List;
+import java.security.GeneralSecurityException;
+import java.util.*;
 
 public class GCalendarAuthorization {
 
+   /* private static Collection<String> collections = new ArrayList<>();
+
+    static {
+
+        collections.add(SQLAdminScopes.SQLSERVICE_ADMIN);
+    }
+        private static AppIdentityCredential newCredential = new AppIdentityCredential(collections);
+*/
+
     /** Application name. */
     private static final String APPLICATION_NAME =
-            "Google Calendar API Java Quickstart";
+            "CalendarApi";
     private static final String DEFAULT_DATA_STORE_DIR = new java.io.File(
             System.getProperty("user.home"), ".credentials/calendar-java-api").getPath();
 
@@ -45,7 +60,7 @@ public class GCalendarAuthorization {
      * at ~/.credentials/calendar-java-quickstart
      */
     private static final List<String> SCOPES =
-            Arrays.asList(CalendarScopes.CALENDAR, CalendarScopes.CALENDAR_READONLY);
+            Arrays.asList(CalendarScopes.CALENDAR);
 
     static {
         try {
@@ -94,5 +109,33 @@ public class GCalendarAuthorization {
                                                                 HTTP_TRANSPORT, JSON_FACTORY, credential)
                                                                 .setApplicationName(APPLICATION_NAME)
                                                                 .build();
+    }
+
+    public static com.google.api.services.calendar.Calendar getCalendarServiceP12(String clientSecretP12) throws GeneralSecurityException, IOException {
+
+        GoogleCredential credential = new GoogleCredential.Builder()
+                .setTransport(HTTP_TRANSPORT)
+                .setJsonFactory(JSON_FACTORY)
+//                .setServiceAccountId("calendarapi@calendarapi-prog-kiev-ua.iam.gserviceaccount.com")
+//                .setServiceAccountPrivateKeyFromP12File(new File("D:\\Java\\GoogleAPI\\GoogleCalendarWrapper\\src\\main\\resources\\CalendarApi-77c68292720c.p12"))
+                .setServiceAccountId("newcalendarapi@calendarapi-prog-kiev-ua.iam.gserviceaccount.com")
+                .setServiceAccountPrivateKeyFromP12File(new File("D:\\Java\\GoogleAPI\\GoogleCalendarWrapper\\src\\main\\resources\\CalendarApi-1ef3864ed125.p12"))
+                //.setServiceAccountScopes(Collections.singleton(SQLAdminScopes.SQLSERVICE_ADMIN))
+                .setServiceAccountScopes(SCOPES)
+//                .setServiceAccountUser("calendarapi@calendarapi-prog-kiev-ua.iam.gserviceaccount.com")
+                //.setServiceAccountUser("newcalendarapi@calendarapi-prog-kiev-ua.iam.gserviceaccount.com")
+                .build();
+        SQLAdmin sqladmin =
+                new SQLAdmin.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
+
+        com.google.api.services.calendar.Calendar.Builder builder = new com.google.api.services.calendar.Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential);
+        builder.setApplicationName(APPLICATION_NAME);
+        com.google.api.services.calendar.Calendar client = builder.build();
+
+        /*return new com.google.api.services.calendar.Calendar.Builder(
+                HTTP_TRANSPORT, JSON_FACTORY, credential)
+                .setApplicationName(APPLICATION_NAME)
+                .build();*/
+        return client;
     }
 }

@@ -4,6 +4,7 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +20,9 @@ public class GCalendar {
 
     public GCalendar connect() throws GCalendarException {
         try {
-            service = GCalendarAuthorization.getCalendarService(jsonCredential);
-        } catch (IOException e) {
+            service = GCalendarAuthorization.getCalendarServiceP12(jsonCredential);
+            System.out.println("service:  " + (service == null));
+        } catch (IOException | GeneralSecurityException e) {
             throw new GCalendarException("Failed connect", e);
         }
         return this;
@@ -71,6 +73,9 @@ public class GCalendar {
             try {
                 service.events().insert(calendarID, Utils.toGoogleEvent(gEvent)).execute();
             } catch (IOException e) {
+                System.out.println("===============================================");
+                e.printStackTrace();
+                System.out.println("===============================================");
                 nonAddedEvents.add(gEvent);
                 //throw new GCalendarException("Can't add events", e);
             }

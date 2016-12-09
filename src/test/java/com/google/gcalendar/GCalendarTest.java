@@ -55,7 +55,7 @@ public class GCalendarTest {
         List<GEvent> list = new ArrayList<>();
         list.add(gEvent);
         List<GEvent> nonAddedEvent = gCalendar.addEvents(list);
-        assertNotNull(nonAddedEvent.isEmpty());
+        assertEquals(0, nonAddedEvent.size());
     }
 
     @Test
