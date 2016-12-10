@@ -46,5 +46,15 @@ public class GEvent {
         this.id = id;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "GEvent{" +
+                ", id='" + id + '\'' +
+                "Title='" + Title + '\'' +
+                ", start=" + start +
+                ", finish=" + finish +
+                '}';
+    }
 }
 

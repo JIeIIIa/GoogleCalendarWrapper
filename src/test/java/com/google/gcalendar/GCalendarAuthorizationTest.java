@@ -2,20 +2,17 @@ package com.google.gcalendar;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.File;
-import java.lang.reflect.Field;
-
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by JIeIIIa on 30.11.2016.
  */
 public class GCalendarAuthorizationTest {
-    String jsonKey = "/client_secret_603944093158-tr62li4i083rrfi80mqojs3aioobl786.apps.googleusercontent.com.json";
+    private static final String PRIVATE_KEY_P12 = "/CalendarApi-1ef3864ed125.p12";
+    private static final String SERVICE_ACCOUNT_ID = "newcalendarapi@calendarapi-prog-kiev-ua.iam.gserviceaccount.com";
+
     @Before
     public void setUp() throws Exception {
 
@@ -26,48 +23,14 @@ public class GCalendarAuthorizationTest {
 
     }
 
-
     @Test
     public void authorize() throws Exception {
-        String credentialFileName = "StoredCredential";
-
-        File credentialFile = deleteCredential(credentialFileName);
-        assertTrue(!credentialFile.exists());
-
-
-        assertNotNull(GCalendarAuthorization.authorize(jsonKey));
-    }
-
-    @Ignore
-    public File deleteCredential(String credentialFileName) throws NoSuchFieldException, ClassNotFoundException, IllegalAccessException {
-        Field f = Class.forName(GCalendarAuthorization.class.getName()).getDeclaredField("DEFAULT_DATA_STORE_DIR");
-        f.setAccessible(true);
-        String path = (String) f.get(null);
-
-        File credentialFile = new File(path, credentialFileName);
-        if (credentialFile.exists()) {
-            assertTrue(credentialFile.delete());
-        }
-        return credentialFile;
-    }
-
-    @Test
-    @Ignore
-    public void deleteCredential() throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
-        String credentialFileName = "StoredCredential";
-        deleteCredential(credentialFileName);
+        assertNotNull(GCalendarAuthorization.authorize(SERVICE_ACCOUNT_ID, PRIVATE_KEY_P12));
     }
 
     @Test
     public void getCalendarService() throws Exception {
-        assertNotNull(GCalendarAuthorization.getCalendarService(jsonKey));
+        assertNotNull(GCalendarAuthorization.getCalendarServiceP12(SERVICE_ACCOUNT_ID, PRIVATE_KEY_P12));
     }
 
-    @Test
-    @Ignore
-    public void newTestAuth() throws Exception {
-        com.google.api.services.calendar.Calendar calendar = GCalendarAuthorization.getCalendarServiceP12("");
-        assertNotNull(calendar);
-
-    }
 }

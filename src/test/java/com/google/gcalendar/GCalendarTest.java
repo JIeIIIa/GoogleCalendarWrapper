@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -16,7 +15,6 @@ import static org.junit.Assert.*;
  * Created by JIeIIIa on 01.12.2016.
  */
 public class GCalendarTest {
-    private final String jsonKey = "/client_secret_603944093158-tr62li4i083rrfi80mqojs3aioobl786.apps.googleusercontent.com.json";
     private final String calendarID = "t2a31bigtnl18r4kpit26vrm84@group.calendar.google.com";
 
     SimpleDateFormat sdf;
@@ -25,7 +23,7 @@ public class GCalendarTest {
 
     @Before
     public void setUp() throws Exception {
-        gCalendar = new GCalendar(jsonKey, calendarID).connect();
+        gCalendar = new GCalendar(calendarID).connect();
         sdf = new SimpleDateFormat("dd.MM.yyyy");
         start = new Date();
     }
@@ -35,12 +33,12 @@ public class GCalendarTest {
     @Test
     public void delEvents() throws Exception {
 
-        GEvent gEvent = new GEvent("Event from app", start, new Date(start.getTime() + 10000));
+        GEvent gEvent = new GEvent("Event from GCalendarApp", start, new Date(start.getTime() + 10000));
         addEvents();
         List<GEvent> readEvents = gCalendar.getEvents(new GEventChecker()
                         .setTitle(gEvent.getTitle())
                         .setStartAfterDate(gEvent.getStart())
-                        .setFinishBeforeDate(gEvent.getFinish()));
+                        .setFinishBeforeDate(gEvent.getFinish()), false);
         assertNotNull(readEvents);
         assertEquals(1, readEvents.size());
         List<GEvent> nonDeleted = gCalendar.delEvents(readEvents);
@@ -51,7 +49,7 @@ public class GCalendarTest {
     @Ignore
     @Test
     public void addEvents() throws Exception {
-        GEvent gEvent = new GEvent("Event from app", start, new Date(start.getTime() + 10000) );
+        GEvent gEvent = new GEvent("Event from GCalendarApp", start, new Date(start.getTime() + 10000) );
         List<GEvent> list = new ArrayList<>();
         list.add(gEvent);
         List<GEvent> nonAddedEvent = gCalendar.addEvents(list);
@@ -62,9 +60,13 @@ public class GCalendarTest {
     public void getEvents() throws Exception {
         List<GEvent> list = gCalendar.getEvents(new GEventChecker()
                                                         .setStartAfterDate(sdf.parse("01.10.2016"))
-                                                        .setFinishBeforeDate(sdf.parse("01.01.2017"))
-                                                        .setTitle("один")
+                                                        .setFinishBeforeDate(sdf.parse("01.06.2017"))
+                                                        .setTitle("Every week by 3"),
+                                                true
         );
+        for (GEvent gEvent : list) {
+            System.out.println(gEvent);
+        }
 
         assertTrue(list.size() > 0);
     }

@@ -4,27 +4,32 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GCalendar {
+    private static final String PRIVATE_KEY_P12 = "/CalendarApi-1ef3864ed125.p12";
+    private static final String SERVICE_ACCOUNT_ID = "newcalendarapi@calendarapi-prog-kiev-ua.iam.gserviceaccount.com";
+
     private com.google.api.services.calendar.Calendar service;
-    private String jsonCredential;
+    private String privateKeyFromP12;
+    private String serviceAccountId;
     private String calendarID;
 
-    public GCalendar(String jsonCredential, String calendarID) {
-        this.jsonCredential = jsonCredential;
+    public GCalendar(String serviceAccountId, String privateKeyFromP12, String calendarID) {
+        this.privateKeyFromP12 = privateKeyFromP12;
+        this.serviceAccountId = serviceAccountId;
+        this.calendarID = calendarID;
+    }
+
+    public GCalendar(String calendarID) {
+        this.privateKeyFromP12 = GCalendarAuthorization.class.getResource(PRIVATE_KEY_P12).getFile();
+        this.serviceAccountId = SERVICE_ACCOUNT_ID;
         this.calendarID = calendarID;
     }
 
     public GCalendar connect() throws GCalendarException {
-        try {
-            service = GCalendarAuthorization.getCalendarServiceP12(jsonCredential);
-            System.out.println("service:  " + (service == null));
-        } catch (IOException | GeneralSecurityException e) {
-            throw new GCalendarException("Failed connect", e);
-        }
+        service = GCalendarAuthorization.getCalendarServiceP12(serviceAccountId, privateKeyFromP12);
         return this;
     }
 
@@ -33,21 +38,14 @@ public class GCalendar {
         return this;
     }
 
-    public List<GEvent> getEvents(GEventChecker checker) throws GCalendarException {
+    public List<GEvent> getEvents(GEventChecker checker, boolean isGrouped) throws GCalendarException {
         List<GEvent> list = new ArrayList<GEvent>();
-
 
         Events events;
         try {
-            com.google.api.services.calendar.Calendar.Events.List readEvents = service.events().list(calendarID);
-            if (checker.getStartAfterDate() != null) {
-                readEvents = readEvents.setTimeMin(new com.google.api.client.util.DateTime(checker.getStartAfterDate()));
-            }
-            if (checker.getFinishBeforeDate() != null) {
-                readEvents = readEvents.setTimeMax(new com.google.api.client.util.DateTime(checker.getFinishBeforeDate()));
-            }
-            if (checker.getTitle() != null) {
-                readEvents = readEvents.setQ(checker.getTitle());
+            com.google.api.services.calendar.Calendar.Events.List readEvents = Utils.GEventCheckerGoogleEventList(service.events().list(calendarID), checker);
+            if (!isGrouped) {
+                readEvents = readEvents.setSingleEvents(true);
             }
             events = readEvents.execute();
         } catch (IOException e) {

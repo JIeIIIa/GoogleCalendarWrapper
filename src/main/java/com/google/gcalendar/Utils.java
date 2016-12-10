@@ -8,7 +8,6 @@ import java.util.Date;
 
 public class Utils {
     public static GEvent toGEvent(Event event) {
-//        System.out.println(event.getStart().getDateTime().);
         GEvent result = new GEvent(event.getSummary(),
                                         new Date(event.getStart().getDateTime().getValue()),
                                         new Date(event.getEnd().getDateTime().getValue()))
@@ -34,5 +33,21 @@ public class Utils {
 
     private static EventDateTime toEventDateTime(long n) {
         return new EventDateTime().setDateTime(new DateTime(n));
+    }
+
+    public static com.google.api.services.calendar.Calendar.Events.List
+        GEventCheckerGoogleEventList(com.google.api.services.calendar.Calendar.Events.List readEvents, GEventChecker checker) {
+
+        if (checker.getStartAfterDate() != null) {
+            readEvents = readEvents.setTimeMin(new com.google.api.client.util.DateTime(checker.getStartAfterDate()));
+        }
+        if (checker.getFinishBeforeDate() != null) {
+            readEvents = readEvents.setTimeMax(new com.google.api.client.util.DateTime(checker.getFinishBeforeDate()));
+        }
+        if (checker.getTitle() != null) {
+            readEvents = readEvents.setQ(checker.getTitle());
+        }
+
+        return readEvents;
     }
 }
