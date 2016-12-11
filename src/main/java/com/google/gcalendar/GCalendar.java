@@ -71,15 +71,27 @@ public class GCalendar {
             try {
                 service.events().insert(calendarID, Utils.toGoogleEvent(gEvent)).execute();
             } catch (IOException e) {
-                System.out.println("===============================================");
-                e.printStackTrace();
-                System.out.println("===============================================");
                 nonAddedEvents.add(gEvent);
-                //throw new GCalendarException("Can't add events", e);
             }
 
         }
         return nonAddedEvents;
+    }
+
+    public List<GEvent> updateEvents(List<GEvent> list) throws GCalendarException {
+        List<GEvent> nonUpdatedEvents = new ArrayList<>();
+        for (GEvent gEvent : list) {
+            try {
+                if (gEvent.getId() != null && gEvent.getId() != "") {
+                    service.events().update(calendarID, gEvent.getId(), Utils.toGoogleEvent(gEvent)).execute();
+                } else {
+                    nonUpdatedEvents.add(gEvent);
+                }
+            } catch (IOException e) {
+                nonUpdatedEvents.add(gEvent);
+            }
+        }
+        return nonUpdatedEvents;
     }
 
     public List<GEvent> delEvents(List<GEvent> list) {

@@ -5,9 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -69,6 +67,38 @@ public class GCalendarTest {
         }
 
         assertTrue(list.size() > 0);
+    }
+
+    @Test
+    public void updateEvent() throws Exception {
+        String titleEvents = "UPDATE: Event from  GCalendarApp";
+        GEvent gEvent = new GEvent(titleEvents, start, new Date(start.getTime() + 10000) );
+        List<GEvent> list = new ArrayList<>();
+        list.add(gEvent);
+        List<GEvent> nonAddedEvent = gCalendar.addEvents(list);
+        assertEquals(0, nonAddedEvent.size());
+
+        List<GEvent> newList = gCalendar.getEvents(new GEventChecker()
+                        .setTitle(titleEvents),
+                true
+        );
+        assertNotNull(newList);
+        assertEquals(1, newList.size());
+
+        for (GEvent event : newList) {
+            event.setFinish(sdf.parse("01.05.2017"));
+        }
+        List<GEvent> res = gCalendar.updateEvents(newList);
+        assertEquals(0, res.size());
+
+        list = gCalendar.getEvents(new GEventChecker().setTitle(titleEvents), false);
+        for (GEvent event : list) {
+            assertEquals(sdf.parse("01.05.2017"), event.getFinish());
+            res = gCalendar.delEvents(Arrays.asList(event));
+            assertEquals(0, res.size());
+        }
+
+
     }
 
 
