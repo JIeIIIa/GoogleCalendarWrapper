@@ -1,12 +1,16 @@
 package com.google.gcalendar;
 
 import java.util.Date;
+import java.util.List;
 
 public class GEvent {
+    private String id;
     private String Title;
     private Date start;
     private Date finish;
-    private String id;
+    private String description;
+    private List<String> Recurrence;
+    private String colorId;
 
     public GEvent(String title, Date start, Date finish) {
         Title = title;

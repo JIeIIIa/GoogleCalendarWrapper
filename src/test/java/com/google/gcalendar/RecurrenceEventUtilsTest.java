@@ -1,27 +1,52 @@
 package com.google.gcalendar;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
 /**
  * Created by JIeIIIa on 14.12.2016.
  */
+@RunWith(value = Parameterized.class)
 public class RecurrenceEventUtilsTest {
-    public SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    public static final String FILE_NAME = "D:\\Java\\GoogleAPI\\GoogleCalendarWrapper\\src\\test\\java\\com\\google\\gcalendar\\RecurrenceEvent.json";
+    private RecurrenceEventTestValue testValue;
+
+    public RecurrenceEventUtilsTest(RecurrenceEventTestValue testValue) {
+        this.testValue = testValue;
+    }
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
+    @Parameterized.Parameters
+    public static Collection<RecurrenceEventTestValue> data() throws FileNotFoundException {
+        JsonRecurrenceEventTestValue jsonTestValue;
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        File file = new File(FILE_NAME);
+
+        jsonTestValue = gson.fromJson(new FileReader(file), JsonRecurrenceEventTestValue.class);
+        return jsonTestValue.getList();
+    }
+
     @Before
     public void setUp() throws Exception {
+
 
     }
 
@@ -30,198 +55,68 @@ public class RecurrenceEventUtilsTest {
 
     }
 
-    public void compareRecurresceString(List<String> result, String first, String second) {
-        assertNotNull(result);
-        assertEquals(2, result.size());
+    public void compareRecurrenceStrings(List<String> expected, List<String> target) {
+        if (expected != null) {
+            assertNotNull(target);
+        }
+        assertEquals(expected.size(), target.size());
+        for (int i = 0; i < expected.size(); i++) {
+            assertEquals(expected.get(i).replaceAll(" ", ""), target.get(i));
+        }
+    }
 
-        String line = result.get(0);
-        assertEquals(first, line);
-
-        line = result.get(1);
-        assertEquals(second, line);
+    public void compereSet(Set<Integer> expected, Set<Integer> target) {
+        if (expected == null) {
+            assertNull(target);
+        } else {
+            assertNotNull(target);
+            assertTrue(expected.containsAll(target));
+            assertTrue(target.containsAll(expected));
+        }
     }
 
     @Test
-    public void recurrenceToList01() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("02.09.1997 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.DAILY);
-        recurrence.setFrequencyCount(10);
+    public void convertingTest() throws Exception {
+        System.out.print("-= " + testValue.getTestName() + "_converting =-");
 
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:19970902T090000",
-                "RRULE:FREQ=DAILY;COUNT=10");
-    }
-
-    @Test
-    public void recurrenceToList02() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("02.09.1997 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.DAILY);
-        recurrence.setEndDate(sdf.parse("24.12.1997 00:00:00"));
-
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:19970902T090000",
-                "RRULE:FREQ=DAILY;UNTIL=19971224T000000Z");
+        List<String> expectedRecurrence = testValue.getCorrectResult();
+        List<String> targetRecurrence = RecurrenceEventUtils.recurrenceToList(testValue.getRecurrenceEvent());
+        compareRecurrenceStrings(expectedRecurrence, targetRecurrence);
+        System.out.println("\t\t\t\t\t\t\t\tOk!");
 
     }
 
     @Test
-    public void recurrenceToList03() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("02.09.1997 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.DAILY);
-        recurrence.setInterval(2);
+    public void parseTest() throws Exception {
+        System.out.print("-= " + testValue.getTestName() + "_parse =-");
 
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:19970902T090000",
-                "RRULE:FREQ=DAILY;INTERVAL=2");
-    }
+        List<String> expectedRecurrence = testValue.getCorrectResult();
 
-    @Test
-    public void recurrenceToList04() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("02.09.1997 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.DAILY);
-        recurrence.setInterval(10);
-        recurrence.setFrequencyCount(5);
+        RecurrenceEvent expectedRecurenceEvent = testValue.getRecurrenceEvent();
+        RecurrenceEvent targetRecurrenceEvent = RecurrenceEventUtils.parseRecurrence(expectedRecurrence);
+        assertEquals(expectedRecurenceEvent.getStartDate(), targetRecurrenceEvent.getStartDate());
+        assertEquals(expectedRecurenceEvent.getFrequencyCount(), targetRecurrenceEvent.getFrequencyCount());
+        assertEquals(expectedRecurenceEvent.getFrequency(), targetRecurrenceEvent.getFrequency());
+        assertEquals(expectedRecurenceEvent.getInterval(), targetRecurrenceEvent.getInterval());
+        assertEquals(expectedRecurenceEvent.getEndDate(), targetRecurrenceEvent.getEndDate());
 
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:19970902T090000",
-                "RRULE:FREQ=DAILY;INTERVAL=10;COUNT=5");
-    }
-
-    @Test
-    public void recurrenceToList05() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("01.01.1998 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.DAILY);
-        recurrence.setByMont(RecurrenceEvent.JANUARY);
-        recurrence.setEndDate(sdf.parse("31.01.2000 14:00:00"));
-
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:19980101T090000",
-                "RRULE:FREQ=DAILY;BYMONTH=1;UNTIL=20000131T140000Z");
-    }
-
-    @Test
-    public void recurrenceToList06() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("02.09.1997 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.WEEKLY);
-        recurrence.setFrequencyCount(10);
-
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:19970902T090000",
-                "RRULE:FREQ=WEEKLY;COUNT=10");
-    }
-
-    @Test
-    public void recurrenceToList07() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("02.09.1997 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.WEEKLY);
-        recurrence.setEndDate(sdf.parse("24.12.1997 00:00:00"));
-
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:19970902T090000",
-                "RRULE:FREQ=WEEKLY;UNTIL=19971224T000000Z");
-    }
-
-    @Test
-    public void recurrenceToList08() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("02.09.1997 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.WEEKLY);
-        recurrence.setByDay(RecurrenceEvent.TUESDAY, RecurrenceEvent.THURSDAY);
-        recurrence.setEndDate(sdf.parse("07.10.1997 00:00:00"));
-
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:19970902T090000",
-                "RRULE:FREQ=WEEKLY;BYDAY=TU,TH;UNTIL=19971007T000000Z");
-    }
-
-    @Test
-    public void recurrenceToList09() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("02.09.1997 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.WEEKLY);
-        recurrence.setByDay(RecurrenceEvent.TUESDAY, RecurrenceEvent.THURSDAY);
-        recurrence.setFrequencyCount(10);
-
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:19970902T090000",
-                "RRULE:FREQ=WEEKLY;COUNT=10;BYDAY=TU,TH");
-    }
-
-    @Test
-    public void recurrenceToList13() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("02.09.1997 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.WEEKLY);
-        recurrence.setByDay(RecurrenceEvent.MONDAY, RecurrenceEvent.SATURDAY, RecurrenceEvent.WEDNESDAY);
-        recurrence.setInterval(2);
-        recurrence.setEndDate(sdf.parse("14.12.2016 08:32:14"));
-
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:19970902T090000",
-                "RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE,SA;UNTIL=20161214T083214Z");
-    }
-
-    @Test
-    public void recurrenceToList14() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("02.01.2016 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.MONTHLY);
-        recurrence.setByMonthDay(1, 5, 10, 11, 15);
-        recurrence.setEndDate(sdf.parse("14.12.2016 08:32:14"));
-
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:20160102T090000",
-                "RRULE:FREQ=MONTHLY;BYMONTHDAY=1,5,10,11,15;UNTIL=20161214T083214Z");
-    }
+        Set<Integer> expected;
+        Set<Integer> target;
+        expected = expectedRecurenceEvent.getDays();
+        target = targetRecurrenceEvent.getDays();
+        compereSet(expected, target);
 
 
-    @Test
-    public void recurrenceToList15() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("02.09.1997 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.MONTHLY);
-        recurrence.setByMonthDay(10, 11, 13, 9, 8, 7, 12);
-        recurrence.setByDay(RecurrenceEvent.SATURDAY);
+        expected = expectedRecurenceEvent.getByMonth();
+        target = targetRecurrenceEvent.getByMonth();
+        compereSet(expected, target);
 
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:19970902T090000",
-                "RRULE:FREQ=MONTHLY;BYDAY=SA;BYMONTHDAY=7,8,9,10,11,12,13");
-    }
+        expected = expectedRecurenceEvent.getByMonthDay();
+        target = targetRecurrenceEvent.getByMonthDay();
+        compereSet(expected, target);
 
-    @Test
-    public void recurrenceToList16() throws Exception {
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setStartDate(sdf.parse("02.09.1997 09:00:00"));
-        recurrence.setFrequency(RecurrenceEvent.YEARLY);
-        recurrence.setByMont(RecurrenceEvent.NOVEMBER);
-        recurrence.setByMonthDay(6, 7, 5, 4, 3, 2, 8);
-        recurrence.setByDay(RecurrenceEvent.TUESDAY);
-        recurrence.setInterval(4);
+        System.out.println("\t\t\t\t\t\t\t\t\t\tOk!");
 
-        compareRecurresceString(RecurrenceEventUtils.recurrenceToList(recurrence),
-                "DTSTART:19970902T090000",
-                "RRULE:FREQ=YEARLY;INTERVAL=4;BYDAY=TU;BYMONTH=11;BYMONTHDAY=2,3,4,5,6,7,8");
-    }
-
-    @Test
-    public void toListException() throws Exception{
-        RecurrenceEvent recurrence = new RecurrenceEvent();
-        recurrence.setFrequency(RecurrenceEvent.YEARLY);
-        recurrence.setByMont(RecurrenceEvent.NOVEMBER);
-        recurrence.setByMonthDay(6, 7, 5, 4, 3, 2, 8);
-        recurrence.setByDay(RecurrenceEvent.TUESDAY);
-        recurrence.setInterval(4);
-
-        exception.expect(GCalendarException.class);
-        exception.expectMessage("Converting error: null startDate");
-        RecurrenceEventUtils.recurrenceToList(recurrence);
     }
 
 }

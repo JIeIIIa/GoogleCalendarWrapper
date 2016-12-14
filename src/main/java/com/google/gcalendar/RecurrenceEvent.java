@@ -17,13 +17,13 @@ public class RecurrenceEvent {
     public static final int YEARLY = 65536;
 
     //const for BYDAY
-    public static final int SUNDAY = 16;
-    public static final int MONDAY = 32;
-    public static final int TUESDAY = 64;
-    public static final int WEDNESDAY = 128;
-    public static final int THURSDAY = 256;
-    public static final int FRIDAY = 512;
-    public static final int SATURDAY = 1024;
+    public static final int MONDAY = 16;
+    public static final int TUESDAY = 32;
+    public static final int WEDNESDAY = 64;
+    public static final int THURSDAY = 128;
+    public static final int FRIDAY = 256;
+    public static final int SATURDAY = 512;
+    public static final int SUNDAY = 1024;
 
     //const for BYMONTH
     public static final int JANUARY = 1;
@@ -81,7 +81,7 @@ public class RecurrenceEvent {
         return localSet;
     }
 
-    public RecurrenceEvent setByMont(int... months) throws GCalendarException {
+    public RecurrenceEvent setByMonth(int... months) throws GCalendarException {
         byMonth = createNumberSet(0, 12, "Wrong month number", months);
         return this;
     }
