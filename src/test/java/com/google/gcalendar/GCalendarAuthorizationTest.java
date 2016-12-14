@@ -10,8 +10,6 @@ import static org.junit.Assert.assertNotNull;
  * Created by JIeIIIa on 30.11.2016.
  */
 public class GCalendarAuthorizationTest {
-    private static final String PRIVATE_KEY_P12 = "/CalendarApi-1ef3864ed125.p12";
-    private static final String SERVICE_ACCOUNT_ID = "newcalendarapi@calendarapi-prog-kiev-ua.iam.gserviceaccount.com";
 
     @Before
     public void setUp() throws Exception {
@@ -25,12 +23,12 @@ public class GCalendarAuthorizationTest {
 
     @Test
     public void authorize() throws Exception {
-        assertNotNull(GCalendarAuthorization.authorize(SERVICE_ACCOUNT_ID, PRIVATE_KEY_P12));
+        assertNotNull(GCalendarAuthorization.authorize(Configuration.SERVICE_ACCOUNT_ID, Configuration.PRIVATE_KEY_P12));
     }
 
     @Test
     public void getCalendarService() throws Exception {
-        assertNotNull(GCalendarAuthorization.getCalendarServiceP12(SERVICE_ACCOUNT_ID, PRIVATE_KEY_P12));
+        assertNotNull(GCalendarAuthorization.getCalendarServiceP12(Configuration.SERVICE_ACCOUNT_ID, Configuration.PRIVATE_KEY_P12));
     }
 
 }

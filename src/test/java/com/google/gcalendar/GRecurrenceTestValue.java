@@ -6,32 +6,32 @@ import java.util.List;
 /**
  * Created by JIeIIIa on 14.12.2016.
  */
-public class RecurrenceEventTestValue {
-    private RecurrenceEvent recurrenceEvent;
+public class GRecurrenceTestValue {
+    private GRecurrence gRecurrence;
     private List<String> correctResult;
     private String testName = "";
 
-    public RecurrenceEventTestValue() {
+    public GRecurrenceTestValue() {
         correctResult = new ArrayList<>();
     }
 
-    public RecurrenceEventTestValue(RecurrenceEvent recurrenceEvent, List<String> correctResult) {
-        this.recurrenceEvent = recurrenceEvent;
+    public GRecurrenceTestValue(GRecurrence gRecurrence, List<String> correctResult) {
+        this.gRecurrence = gRecurrence;
         this.correctResult = correctResult;
     }
 
-    public RecurrenceEventTestValue(RecurrenceEvent recurrenceEvent, List<String> correctResult, String testName) {
-        this.recurrenceEvent = recurrenceEvent;
+    public GRecurrenceTestValue(GRecurrence gRecurrence, List<String> correctResult, String testName) {
+        this.gRecurrence = gRecurrence;
         this.correctResult = correctResult;
         this.testName = testName;
     }
 
-    public RecurrenceEvent getRecurrenceEvent() {
-        return recurrenceEvent;
+    public GRecurrence getgRecurrence() {
+        return gRecurrence;
     }
 
-    public void setRecurrenceEvent(RecurrenceEvent recurrenceEvent) {
-        this.recurrenceEvent = recurrenceEvent;
+    public void setgRecurrence(GRecurrence gRecurrence) {
+        this.gRecurrence = gRecurrence;
     }
 
     public List<String> getCorrectResult() {

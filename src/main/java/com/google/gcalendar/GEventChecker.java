@@ -59,7 +59,7 @@ public class GEventChecker implements GEventCheckable {
         cFirst.setTimeInMillis(first.getTime());
         cFirst.set(Calendar.MILLISECOND, 0);
         Calendar cSecond = Calendar.getInstance();
-        cSecond.setTimeInMillis(first.getTime());
+        cSecond.setTimeInMillis(second.getTime());
         cSecond.set(Calendar.MILLISECOND, 0);
 
         return cFirst.equals(cSecond);
@@ -69,7 +69,7 @@ public class GEventChecker implements GEventCheckable {
         boolean res = true;
         if (startAfterDate != null) {
             boolean tmp = startAfterDate.before(event.getStart()) ;
-            tmp |= compareDate(startAfterDate,event.getStart());
+            tmp = tmp || compareDate(startAfterDate,event.getStart());
             res = tmp;
         }
         if (startBeforeDate != null) {

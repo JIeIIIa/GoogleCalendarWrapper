@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GCalendar {
-    private static final String PRIVATE_KEY_P12 = "/CalendarApi-1ef3864ed125.p12";
+    private static final String PRIVATE_KEY_P12 = "D:\\Java\\GoogleAPI\\GoogleCalendarWrapper\\src\\main\\resources\\CalendarApi-1ef3864ed125.p12";
     private static final String SERVICE_ACCOUNT_ID = "newcalendarapi@calendarapi-prog-kiev-ua.iam.gserviceaccount.com";
 
     private com.google.api.services.calendar.Calendar service;
@@ -23,7 +23,7 @@ public class GCalendar {
     }
 
     public GCalendar(String calendarID) {
-        this.privateKeyFromP12 = GCalendarAuthorization.class.getResource(PRIVATE_KEY_P12).getFile();
+        this.privateKeyFromP12 = PRIVATE_KEY_P12; //GCalendarAuthorization.class.getResource(PRIVATE_KEY_P12).getFile();
         this.serviceAccountId = SERVICE_ACCOUNT_ID;
         this.calendarID = calendarID;
     }

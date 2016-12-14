@@ -7,7 +7,11 @@ import java.util.List;
  * Created by JIeIIIa on 01.12.2016.
  */
 public class JsonGEvent {
-    private final List<GEvent> list;
+    private List<GEvent> list;
+
+    public JsonGEvent() {
+        list = new ArrayList<>();
+    }
 
     public JsonGEvent(List<GEvent> sourceList) {
         list = new ArrayList<GEvent>(sourceList);
@@ -26,5 +30,13 @@ public class JsonGEvent {
                 }
             }
         }
+    }
+
+    public List<GEvent> getList() {
+        return list;
+    }
+
+    public void setList(List<GEvent> list) {
+        this.list = new ArrayList<GEvent>(list);
     }
 }

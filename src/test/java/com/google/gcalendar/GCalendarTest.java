@@ -13,7 +13,6 @@ import static org.junit.Assert.*;
  * Created by JIeIIIa on 01.12.2016.
  */
 public class GCalendarTest {
-    private final String calendarID = "t2a31bigtnl18r4kpit26vrm84@group.calendar.google.com";
 
     SimpleDateFormat sdf;
     Date start;
@@ -21,7 +20,7 @@ public class GCalendarTest {
 
     @Before
     public void setUp() throws Exception {
-        gCalendar = new GCalendar(calendarID).connect();
+        gCalendar = new GCalendar(Configuration.CALENDAR_ID).connect();
         sdf = new SimpleDateFormat("dd.MM.yyyy");
         start = new Date();
     }

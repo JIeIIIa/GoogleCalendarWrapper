@@ -10,9 +10,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -23,11 +23,11 @@ import static org.junit.Assert.*;
  * Created by JIeIIIa on 14.12.2016.
  */
 @RunWith(value = Parameterized.class)
-public class RecurrenceEventUtilsTest {
-    public static final String FILE_NAME = "D:\\Java\\GoogleAPI\\GoogleCalendarWrapper\\src\\test\\java\\com\\google\\gcalendar\\RecurrenceEvent.json";
-    private RecurrenceEventTestValue testValue;
+public class GRecurrenceUtilsTest {
 
-    public RecurrenceEventUtilsTest(RecurrenceEventTestValue testValue) {
+    private GRecurrenceTestValue testValue;
+
+    public GRecurrenceUtilsTest(GRecurrenceTestValue testValue) {
         this.testValue = testValue;
     }
 
@@ -35,12 +35,12 @@ public class RecurrenceEventUtilsTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Parameterized.Parameters
-    public static Collection<RecurrenceEventTestValue> data() throws FileNotFoundException {
-        JsonRecurrenceEventTestValue jsonTestValue;
+    public static Collection<GRecurrenceTestValue> data() throws FileNotFoundException {
+        JsonGRecurrenceTestValue jsonTestValue;
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        File file = new File(FILE_NAME);
+        File file = new File(Configuration.RECURRENCE_EVENT_TEST_JSON);
 
-        jsonTestValue = gson.fromJson(new FileReader(file), JsonRecurrenceEventTestValue.class);
+        jsonTestValue = gson.fromJson(new FileReader(file), JsonGRecurrenceTestValue.class);
         return jsonTestValue.getList();
     }
 
@@ -79,9 +79,9 @@ public class RecurrenceEventUtilsTest {
     public void convertingTest() throws Exception {
         System.out.print("-= " + testValue.getTestName() + "_converting =-");
 
-        List<String> expectedRecurrence = testValue.getCorrectResult();
-        List<String> targetRecurrence = RecurrenceEventUtils.recurrenceToList(testValue.getRecurrenceEvent());
-        compareRecurrenceStrings(expectedRecurrence, targetRecurrence);
+        List<String> expectedGRecurrence = testValue.getCorrectResult();
+        List<String> targetRecurrence = GRecurrenceUtils.toList(testValue.getgRecurrence());
+        compareRecurrenceStrings(expectedGRecurrence, targetRecurrence);
         System.out.println("\t\t\t\t\t\t\t\tOk!");
 
     }
@@ -92,27 +92,27 @@ public class RecurrenceEventUtilsTest {
 
         List<String> expectedRecurrence = testValue.getCorrectResult();
 
-        RecurrenceEvent expectedRecurenceEvent = testValue.getRecurrenceEvent();
-        RecurrenceEvent targetRecurrenceEvent = RecurrenceEventUtils.parseRecurrence(expectedRecurrence);
-        assertEquals(expectedRecurenceEvent.getStartDate(), targetRecurrenceEvent.getStartDate());
-        assertEquals(expectedRecurenceEvent.getFrequencyCount(), targetRecurrenceEvent.getFrequencyCount());
-        assertEquals(expectedRecurenceEvent.getFrequency(), targetRecurrenceEvent.getFrequency());
-        assertEquals(expectedRecurenceEvent.getInterval(), targetRecurrenceEvent.getInterval());
-        assertEquals(expectedRecurenceEvent.getEndDate(), targetRecurrenceEvent.getEndDate());
+        GRecurrence expectedGRecurrence = testValue.getgRecurrence();
+        GRecurrence targetGRecurrence = GRecurrenceUtils.parseRecurrence(expectedRecurrence);
+        assertEquals(expectedGRecurrence.getStartDate(), targetGRecurrence.getStartDate());
+        assertEquals(expectedGRecurrence.getFrequencyCount(), targetGRecurrence.getFrequencyCount());
+        assertEquals(expectedGRecurrence.getFrequency(), targetGRecurrence.getFrequency());
+        assertEquals(expectedGRecurrence.getInterval(), targetGRecurrence.getInterval());
+        assertEquals(expectedGRecurrence.getEndDate(), targetGRecurrence.getEndDate());
 
         Set<Integer> expected;
         Set<Integer> target;
-        expected = expectedRecurenceEvent.getDays();
-        target = targetRecurrenceEvent.getDays();
+        expected = expectedGRecurrence.getDays();
+        target = targetGRecurrence.getDays();
         compereSet(expected, target);
 
 
-        expected = expectedRecurenceEvent.getByMonth();
-        target = targetRecurrenceEvent.getByMonth();
+        expected = expectedGRecurrence.getByMonth();
+        target = targetGRecurrence.getByMonth();
         compereSet(expected, target);
 
-        expected = expectedRecurenceEvent.getByMonthDay();
-        target = targetRecurrenceEvent.getByMonthDay();
+        expected = expectedGRecurrence.getByMonthDay();
+        target = targetGRecurrence.getByMonthDay();
         compereSet(expected, target);
 
         System.out.println("\t\t\t\t\t\t\t\t\t\tOk!");

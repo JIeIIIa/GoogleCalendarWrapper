@@ -38,19 +38,22 @@ public class GEventCheckerTest {
         if (debugMode) {
             System.out.println("-= BEGIN " + event.getTitle() + " =-");
         }
-        GEventChecker checker = new GEventChecker().setStartBeforeDate(startBefore);
+
+        GEventChecker checker = new GEventChecker().setStartAfterDate(startAfter);
         boolean res = checker.check(event);
+        assertEquals(results[0], res);
+        if (debugMode) {
+            System.out.println("   ->setStartAfterDate");
+        }
+
+        checker = new GEventChecker().setStartBeforeDate(startBefore);
+        res = checker.check(event);
         assertEquals(results[1], res);
         if (debugMode) {
             System.out.println("   ->setStartBeforeDate");
         }
 
-        checker = new GEventChecker().setStartAfterDate(startAfter);
-        res = checker.check(event);
-        assertEquals(results[0], res);
-        if (debugMode) {
-            System.out.println("   ->setStartAfterDate");
-        }
+
 
         checker = new GEventChecker().setFinishBeforeDate(finishBefore);
         res = checker.check(event);
